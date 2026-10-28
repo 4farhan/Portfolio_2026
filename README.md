@@ -13,7 +13,9 @@ npm run dev
 
 Open http://127.0.0.1:4173. The checked-in `js/leaves.js` bundle lets the existing
 static host serve the site without a runtime dependency on a CDN or Node.js.
-Rebuild after editing the leaf source.
+Rebuild after editing the leaf source. The build also packages the page, styles,
+scripts, images, and resume into `public/`, which Vercel serves using the
+configuration in `vercel.json`. This generated folder is ignored by Git.
 
 ## Effects
 
