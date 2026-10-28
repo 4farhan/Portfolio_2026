@@ -116,78 +116,6 @@
     }
   });
 
-  // ── Book View ──
-  const bookOverlay = document.getElementById('book-overlay');
-  const bookClose = document.getElementById('book-close');
-  let galleryIndex = 0;
-  let galleryTotal = 0;
-
-  function setGalleryIndex(i) {
-    const track = document.getElementById('gallery-track');
-    const dots = document.querySelectorAll('.gallery-dot');
-    galleryIndex = Math.max(0, Math.min(i, galleryTotal - 1));
-    track.style.transform = `translateX(-${galleryIndex * 100}%)`;
-    dots.forEach((d, j) => d.classList.toggle('active', j === galleryIndex));
-    document.getElementById('gallery-prev').disabled = galleryIndex === 0;
-    document.getElementById('gallery-next').disabled = galleryIndex === galleryTotal - 1;
-  }
-
-  function openBook(data) {
-    document.getElementById('book-title').textContent = data.title;
-    document.getElementById('book-date').textContent = data.date;
-    document.getElementById('book-desc').textContent = data.desc;
-    document.getElementById('book-tech').textContent = data.tech;
-
-    // Images
-    const track = document.getElementById('gallery-track');
-    const dotsEl = document.getElementById('gallery-dots');
-    track.innerHTML = '';
-    dotsEl.innerHTML = '';
-    const srcs = data.images ? data.images.split(',').map(s => s.trim()).filter(Boolean) : [];
-    galleryTotal = srcs.length;
-    srcs.forEach((src, i) => {
-      const img = document.createElement('img');
-      img.src = src; img.className = 'gallery-img'; img.alt = data.title;
-      track.appendChild(img);
-      const dot = document.createElement('div');
-      dot.className = 'gallery-dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', () => setGalleryIndex(i));
-      dotsEl.appendChild(dot);
-    });
-    galleryIndex = 0;
-    setGalleryIndex(0);
-
-    // Links
-    const linksEl = document.getElementById('book-links');
-    linksEl.innerHTML = '';
-    if (data.devpost) {
-      const a = document.createElement('a');
-      a.href = data.devpost; a.target = '_blank'; a.rel = 'noopener';
-      a.className = 'book-link'; a.textContent = 'Devpost ↗';
-      linksEl.appendChild(a);
-    }
-    if (data.github) {
-      const a = document.createElement('a');
-      a.href = data.github; a.target = '_blank'; a.rel = 'noopener';
-      a.className = 'book-link'; a.textContent = 'GitHub ↗';
-      linksEl.appendChild(a);
-    }
-
-    bookOverlay.classList.remove('closing');
-    bookOverlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeBook() {
-    bookOverlay.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  document.getElementById('gallery-prev').addEventListener('click', () => setGalleryIndex(galleryIndex - 1));
-  document.getElementById('gallery-next').addEventListener('click', () => setGalleryIndex(galleryIndex + 1));
-
-  // project click disabled for now
-
   // Mobile touch — show bg image on press
   document.querySelectorAll('.project-entry').forEach(entry => {
     entry.addEventListener('touchstart', () => {
@@ -201,10 +129,4 @@
     }, { passive: true });
   });
 
-  bookClose.addEventListener('click', closeBook);
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeBook();
-    if (e.key === 'ArrowRight') setGalleryIndex(galleryIndex + 1);
-    if (e.key === 'ArrowLeft') setGalleryIndex(galleryIndex - 1);
-  });
 })();

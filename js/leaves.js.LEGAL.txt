@@ -1,0 +1,23 @@
+/*!
+ * ASCII effect adapted from https://github.com/isladjan/ascii
+ * Upstream commit: bc53507c6d4ccadf23721d1c415d019ad1294c03
+ * Copyright (c) 2024 isladjan. MIT License; see THIRD_PARTY_LICENSES.md.
+ * Adaptations: retain the rendered scene's colors and composite glyphs on white.
+ */
+
+Bundled license information:
+
+three/build/three.module.js:
+  /**
+   * @license
+   * Copyright 2010-2024 Three.js Authors
+   * SPDX-License-Identifier: MIT
+   */
+
+postprocessing/build/index.js:
+  /**
+   * postprocessing v6.36.4 build Tue Nov 05 2024
+   * https://github.com/pmndrs/postprocessing
+   * Copyright 2015-2024 Raoul van Rüschen
+   * @license Zlib
+   */

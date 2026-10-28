@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <canvas id="leaves-canvas"></canvas>
+  <canvas id="leaves-canvas" aria-hidden="true"></canvas>
 
   <div class="container">
     <!-- Hero -->
@@ -27,23 +27,23 @@
       <div class="entry">
         <div class="entry-header">
           <div>
-            <span class="entry-role">Google Developer Group</span>
-            <span class="entry-separator"> — </span>
-            <span class="entry-company">McMaster University</span>
+            <span class="entry-role">McMaster Start Coding</span>
           </div>
-          <span class="entry-date">Sept. 2025 – Present</span>
+          <span class="entry-date">July 2026 – Present</span>
         </div>
+        <p class="entry-description">Lead eight developers maintaining a coding platform for 11,000+ students across six countries, and build visual coding tools with Elm and Haskell.</p>
       </div>
 
       <div class="entry">
         <div class="entry-header">
           <div>
-            <span class="entry-role">Robotics Instructor</span>
+            <span class="entry-role">Software Engineer Intern</span>
             <span class="entry-separator"> — </span>
-            <span class="entry-company">Boswin Robotics</span>
+            <span class="entry-company">PLASP</span>
           </div>
-          <span class="entry-date">June – Sept. 2024</span>
+          <span class="entry-date">June – Sept. 2025</span>
         </div>
+        <p class="entry-description">Built Python scripts that automated student-record audits, reclaimed 20 hours of manual review per week, and reduced SIS data errors by 15%.</p>
       </div>
     </section>
 
@@ -54,10 +54,10 @@
       <div class="entry project-entry" data-bg="images/Plutos.png"
         data-title="Ploutos"
         data-date="2026"
-        data-desc="An AI-powered financial platform built for Canadian small businesses and entrepreneurs. Upload financial documents and visualize them in an interactive node graph with drag-and-drop cost and revenue adjustment. An AI agent powered by Google Gemini scores business health, identifies risks, and for expansion planning integrates foot traffic data, competitor density, and interest rates to recommend optimal locations on a 3D map."
-        data-tech="Next.js · Python · FastAPI · Google Gemini · Mapbox GL JS · Auth0 · BestTime API"
+        data-desc="An interactive financial modeling platform for business users. It ranked 15+ candidate expansion sites using live foot traffic, competitor density, and economic data, then delivered financial risk scores and recommendations in under 10 seconds."
+        data-tech="Next.js · FastAPI · Gemini · Backboard · Mapbox GL JS"
         data-devpost="https://devpost.com/software/ploutos-r5gdhu"
-        data-github="https://github.com/DYoussef999/Ploutos"
+        data-github="https://github.com/4farhan/Ploutos"
         data-images="images/Plutos.png">
         <div class="project-bg"></div>
         <div class="entry-content">
@@ -66,23 +66,23 @@
               <span class="entry-role">Ploutos</span>
               <span class="project-links">
                 <a href="https://devpost.com/software/ploutos-r5gdhu" target="_blank" class="project-link">Devpost <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg></a>
-                <a href="https://github.com/DYoussef999/Ploutos" target="_blank" class="project-link">GitHub <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg></a>
+                <a href="https://github.com/4farhan/Ploutos" target="_blank" class="project-link">GitHub <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg></a>
               </span>
             </div>
             <span class="entry-date">2026</span>
           </div>
-          <p class="entry-description">AI-powered financial platform for Canadian small businesses — upload docs, visualize finances in a node graph, and find optimal expansion locations on a 3D map.</p>
-          <div class="entry-tech">Next.js · Python · Gemini AI · Mapbox · FastAPI</div>
+          <p class="entry-description">Interactive financial modeling platform that ranked 15+ expansion sites and delivered AI-powered risk scores and recommendations in under 10 seconds.</p>
+          <div class="entry-tech">Next.js · FastAPI · Gemini · Backboard · Mapbox GL JS</div>
         </div>
       </div>
 
       <div class="entry project-entry" data-bg="images/sweepify.png"
         data-title="Sweepify"
         data-date="2025"
-        data-desc="A community-driven mobile app that gamifies neighborhood environmental cleanup. Users earn points by uploading before-and-after photos of areas they've cleaned, verified through GPS tracking and image validation to prevent misuse. Built to make environmental action social and rewarding."
-        data-tech="JavaScript · Python · TypeScript · GPS API"
+        data-desc="A full-stack community cleanup platform that logged 85+ verified cleanups across Toronto by 40 members through GPS-tagged photo submissions, then visualized crowdsourced litter hotspots on a real-time map."
+        data-tech="Next.js · Flask · Firebase · Google Maps API"
         data-devpost="https://devpost.com/software/sweepify"
-        data-github="https://github.com/abnormallynormal/sweepify"
+        data-github="https://github.com/4farhan/sweepify"
         data-images="images/sweepify.png">
         <div class="project-bg" style="background-position: center 45%;"></div>
         <div class="entry-content">
@@ -91,47 +91,38 @@
               <span class="entry-role">Sweepify</span>
               <span class="project-links">
                 <a href="https://devpost.com/software/sweepify" target="_blank" class="project-link">Devpost <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg></a>
-                <a href="https://github.com/abnormallynormal/sweepify" target="_blank" class="project-link">GitHub <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg></a>
+                <a href="https://github.com/4farhan/sweepify" target="_blank" class="project-link">GitHub <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg></a>
               </span>
             </div>
             <span class="entry-date">2025</span>
           </div>
-          <p class="entry-description">Community app that gamifies neighborhood cleanup — earn points by uploading before-and-after photos of cleaned areas with GPS verification.</p>
-          <div class="entry-tech">JavaScript · Python · TypeScript · GPS</div>
+          <p class="entry-description">Full-stack platform that logged 85+ verified Toronto cleanups by 40 members and mapped crowdsourced litter hotspots in real time.</p>
+          <div class="entry-tech">Next.js · Flask · Firebase · Google Maps API</div>
+        </div>
+      </div>
+
+      <div class="entry project-entry"
+        data-title="Blinko"
+        data-date="2024 – 2025"
+        data-desc="A self-built tutoring platform used by 130+ students, with authentication, scheduling, session management, a real-time collaborative whiteboard, live chat, and a context-aware Gemini assistant."
+        data-tech="Python · Flask · HTML · CSS · JavaScript · WebSockets · Gemini API"
+        data-github="https://github.com/4farhan/Tutoring-Website">
+        <div class="project-bg"></div>
+        <div class="entry-content">
+          <div class="entry-header">
+            <div>
+              <span class="entry-role">Blinko</span>
+              <span class="project-links">
+                <a href="https://github.com/4farhan/Tutoring-Website" target="_blank" class="project-link">GitHub <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 9L9 1M9 1H3M9 1V7"/></svg></a>
+              </span>
+            </div>
+            <span class="entry-date">2024 – 2025</span>
+          </div>
+          <p class="entry-description">Tutoring platform used by 130+ students, with scheduling, session management, a collaborative whiteboard, live chat, and a context-aware AI assistant.</p>
+          <div class="entry-tech">Python · Flask · JavaScript · WebSockets · Gemini API</div>
         </div>
       </div>
     </section>
-
-    <!-- Book View -->
-    <div class="book-overlay" id="book-overlay">
-      <div class="book-scene" id="book-scene">
-        <!-- Left page: spine shadow + info -->
-        <div class="book-page book-left" id="book-left">
-          <div class="book-left-inner">
-            <button class="book-close" id="book-close">← back</button>
-            <div class="book-info">
-              <h2 class="book-title" id="book-title"></h2>
-              <span class="book-date" id="book-date"></span>
-              <p class="book-desc" id="book-desc"></p>
-              <div class="book-tech" id="book-tech"></div>
-              <div class="book-links" id="book-links"></div>
-            </div>
-          </div>
-          <div class="book-spine"></div>
-        </div>
-        <!-- Right page: image gallery -->
-        <div class="book-page book-right" id="book-right">
-          <div class="book-gallery" id="book-gallery">
-            <button class="gallery-arrow gallery-prev" id="gallery-prev">‹</button>
-            <div class="gallery-track-wrap">
-              <div class="gallery-track" id="gallery-track"></div>
-            </div>
-            <button class="gallery-arrow gallery-next" id="gallery-next">›</button>
-          </div>
-          <div class="gallery-dots" id="gallery-dots"></div>
-        </div>
-      </div>
-    </div>
 
     <!-- Signature -->
     <section class="signature-section">
@@ -149,7 +140,7 @@
     <!-- Footer -->
     <footer>
       <div class="social-links">
-        <a href="https://github.com/yFurhan" target="_blank" rel="noopener" class="social-link" aria-label="GitHub">
+        <a href="https://github.com/4farhan" target="_blank" rel="noopener" class="social-link" aria-label="GitHub">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
           </svg>
