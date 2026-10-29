@@ -18,7 +18,7 @@ for (const output of result.outputFiles) {
 
 // Vercel serves only this generated static output, not the source repository.
 await mkdir('public/js', { recursive: true });
-for (const file of ['index.html', 'icon.png', 'resume.pdf', 'THIRD_PARTY_LICENSES.md', 'js/leaves.js', 'js/leaves.js.LEGAL.txt', 'js/effects.js']) {
+for (const file of ['index.html', 'icon.png', 'icon.svg', 'resume.pdf', 'THIRD_PARTY_LICENSES.md', 'js/leaves.js', 'js/leaves.js.LEGAL.txt', 'js/effects.js']) {
   await cp(file, `public/${file}`);
 }
 for (const directory of ['css', 'images']) {

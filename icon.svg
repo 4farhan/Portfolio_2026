@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Farhan's ASCII leaf</title>
+  <defs>
+    <linearGradient id="autumn" x1="12" y1="10" x2="52" y2="46" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9f3013"/>
+      <stop offset=".35" stop-color="#eb6710"/>
+      <stop offset=".56" stop-color="#ffc426"/>
+      <stop offset=".8" stop-color="#f18b0d"/>
+      <stop offset="1" stop-color="#bc3c0b"/>
+    </linearGradient>
+    <mask id="ascii">
+      <g fill="white" text-anchor="middle" font-family="'Courier New',monospace" font-size="8" font-weight="bold" transform="rotate(32 32 32)">
+        <text x="32" y="9">^</text>
+        <text x="32" y="14">/x\</text>
+        <text x="32" y="19">/x##\</text>
+        <text x="32" y="24">/x###%\</text>
+        <text x="32" y="29">&lt;x###%%@&gt;</text>
+        <text x="32" y="34">&lt;x###%%@&gt;</text>
+        <text x="32" y="39">\x##%@/</text>
+        <text x="32" y="44">\x#%/</text>
+        <text x="32" y="49">\|/</text>
+        <text x="32" y="54">|</text>
+        <text x="32" y="59">/</text>
+      </g>
+    </mask>
+  </defs>
+  <g mask="url(#ascii)">
+    <path fill="url(#autumn)" d="M0 0h64v64H0z"/>
+    <path d="M32 6Q34 27 31 55" fill="none" stroke="#8b3512" stroke-width="1.6" opacity=".65" transform="rotate(32 32 32)"/>
+  </g>
+</svg>
