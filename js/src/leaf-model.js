@@ -6,9 +6,14 @@ export function leafSurface(t, side) {
   const profile = Math.pow(Math.sin(Math.PI * t), 0.78);
   const serration = 1 + 0.045 * Math.sin(t * Math.PI * 18);
   return new Vector3(
-    side * profile * serration * 0.66,
+    side * profile * serration * 0.73,
     -1 + t * 2.25,
-    0.14 * profile * (1 - Math.abs(side)) + 0.22 * side * side * profile + 0.16 * t * t
+    // A raised central fold, dropped edges, curled tip and uneven edge ripples
+    // give the ASCII pass a range of surface normals instead of a flat blade.
+    0.38 * profile * (1 - Math.pow(Math.abs(side), 0.65))
+      - 0.27 * side * side * profile
+      + 0.5 * Math.pow(t, 3)
+      + 0.055 * Math.sin(t * Math.PI * 6 + side) * Math.abs(side) * profile
   );
 }
 
@@ -16,6 +21,7 @@ export function createLeafGeometry() {
   const rows = 32;
   const columns = 18;
   const positions = [];
+  const colors = [];
   const indices = [];
   const layerSize = (rows + 1) * (columns + 1);
 
@@ -24,6 +30,9 @@ export function createLeafGeometry() {
       for (let column = 0; column <= columns; column += 1) {
         const point = leafSurface(row / rows, column / columns * 2 - 1);
         positions.push(point.x, point.y, point.z + (layer === 0 ? 0.012 : -0.012));
+        // The reverse is slightly darker; both faces keep the seasonal hue.
+        const tone = layer === 0 ? 1 : 0.66;
+        colors.push(tone, tone, tone);
       }
     }
     for (let row = 0; row < rows; row += 1) {
@@ -50,6 +59,7 @@ export function createLeafGeometry() {
 
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
   return geometry;
@@ -57,7 +67,7 @@ export function createLeafGeometry() {
 
 export function createLeafModel(geometry, color) {
   const group = new Group();
-  const bladeMaterial = new MeshStandardMaterial({ color, roughness: 0.86, metalness: 0 });
+  const bladeMaterial = new MeshStandardMaterial({ color, vertexColors: true, roughness: 0.48, metalness: 0 });
   const veinMaterial = new MeshStandardMaterial({ color, roughness: 0.9 });
   veinMaterial.color.multiplyScalar(0.62);
   group.add(new Mesh(geometry, bladeMaterial));
@@ -71,7 +81,7 @@ export function createLeafModel(geometry, color) {
     new Vector3(-0.08, -1.44, 0.01),
     new Vector3(0, -1, 0.02),
     ...[0.15, 0.35, 0.55, 0.75, 0.98].map((t) => leafSurface(t, 0).add(new Vector3(0, 0, 0.027)))
-  ], 0.017);
+  ], 0.024);
 
   for (const t of [0.22, 0.4, 0.58, 0.74]) {
     for (const side of [-1, 1]) {
@@ -79,7 +89,7 @@ export function createLeafModel(geometry, color) {
         leafSurface(t, 0).add(new Vector3(0, 0, 0.025)),
         leafSurface(t + 0.065, side * 0.45).add(new Vector3(0, 0, 0.02)),
         leafSurface(Math.min(t + 0.15, 0.97), side * 0.9).add(new Vector3(0, 0, 0.018))
-      ], 0.008);
+      ], 0.011);
     }
   }
   return group;

@@ -39,6 +39,13 @@ export class LeafInteraction {
     return new Vector2((this.projected.x + 1) * innerWidth / 2, (1 - this.projected.y) * innerHeight / 2);
   }
 
+  screenRadius(leaf) {
+    const perspective = this.camera.isPerspectiveCamera
+      ? this.camera.position.z / Math.max(1, this.camera.position.z - leaf.position.z)
+      : 1;
+    return leaf.userData.baseSize * 1.6 * perspective;
+  }
+
   cancel() {
     this.release();
     this.pointerPresent = false;
@@ -63,7 +70,7 @@ export class LeafInteraction {
   findLeaf() {
     const candidates = this.leaves.filter((leaf) => {
       if (!this.canSplit(leaf)) return false;
-      return this.screenPosition(leaf.position).distanceTo(this.pointer) < leaf.userData.baseSize * 1.6;
+      return this.screenPosition(leaf.position).distanceTo(this.pointer) < this.screenRadius(leaf);
     });
     if (!candidates.length) return null;
     this.scene.updateMatrixWorld(true);
@@ -77,7 +84,7 @@ export class LeafInteraction {
     const { leaf, position, rotation } = this.active;
     const parent = leaf.userData;
     const size = parent.baseSize * CHILD_SCALE;
-    this.releaseZone = { point: this.screenPosition(position), radius: parent.baseSize * 1.55 };
+    this.releaseZone = { point: this.screenPosition(position), radius: this.screenRadius(leaf) };
 
     for (const direction of [-1, 1]) {
       // Cloning shares the parent's exact materials, including its seasonal hue.
@@ -115,7 +122,7 @@ export class LeafInteraction {
     }
     if (this.active) {
       const active = this.active;
-      const radius = active.leaf.userData.baseSize * 1.55;
+      const radius = this.screenRadius(active.leaf);
       if (this.screenPosition(active.position).distanceTo(this.pointer) > radius) {
         this.release();
         return;

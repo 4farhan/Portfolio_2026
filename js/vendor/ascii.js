@@ -22,7 +22,9 @@ const fragment = `
     vec2 pixelizedUV = grid * (0.5 + floor(sourceUV / grid));
     vec4 pixelized = texture2D(inputBuffer, pixelizedUV);
     float brightness = dot(pixelized.rgb, vec3(0.299, 0.587, 0.114));
-    float density = pow(clamp(brightness, 0.0, 1.0), 0.4);
+    float peak = max(max(pixelized.r, pixelized.g), pixelized.b);
+    // Keep shaded faces legible rather than mapping them to empty spaces.
+    float density = mix(0.28, 1.0, pow(clamp(peak * 0.75 + brightness * 0.25, 0.0, 1.0), 0.6));
     float characterIndex = floor((uCharactersCount - 1.0) * density);
     vec2 characterPosition = vec2(mod(characterIndex, SIZE.x), floor(characterIndex / SIZE.y));
     vec2 localUV = fract(glyphUV * cell);
@@ -31,7 +33,7 @@ const fragment = `
       1.0 - (characterPosition.y + 1.0 - localUV.y) / SIZE.y
     );
     vec4 asciiCharacter = texture2D(uCharacters, charUV);
-    float coverage = asciiCharacter.a * step(0.015, brightness);
+    float coverage = asciiCharacter.a * step(0.002, peak);
     return vec4(pixelized.rgb, coverage);
   }
 
@@ -42,14 +44,16 @@ const fragment = `
     shadow += sampleGlyph(uv + grid * vec2(-2.0, 2.0), uv).a * 0.055;
     vec3 background = mix(uBackground, vec3(0.12, 0.105, 0.09), shadow);
     float peak = max(max(leaf.r, leaf.g), leaf.b);
-    float shading = smoothstep(0.025, 0.7, peak);
-    vec3 tint = leaf.rgb / max(peak, 0.001) * mix(0.025, 0.32, shading);
+    float shading = 0.1 + 0.9 * pow(clamp(peak, 0.0, 1.0), 0.7);
+    vec3 tint = leaf.rgb / max(peak, 0.001) * shading;
+    // A faint tint beneath the glyphs keeps the curled silhouette readable.
+    background = mix(background, tint, step(0.002, peak) * 0.1);
     outputColor = vec4(mix(background, tint, leaf.a * uOpacity), 1.0);
   }
 `;
 
 export class ASCII extends Effect {
-  constructor({ font = 'monospace', characters = ' .:-=+*x%#@', fontSize = 60, cellSize = 8, opacity = 0.85, background = '#ffffff' } = {}) {
+  constructor({ font = 'monospace', characters = ' .,:;=+ox%#@', fontSize = 60, cellSize = 6, opacity = 1, background = '#ffffff' } = {}) {
     const uniforms = new Map([
       ['uCharacters', new Uniform(new Texture())],
       ['uCellSize', new Uniform(cellSize)],

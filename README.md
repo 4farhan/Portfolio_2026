@@ -19,8 +19,11 @@ configuration in `vercel.json`. This generated folder is ignored by Git.
 
 ## Effects
 
-- `js/src/leaf-model.js` builds a curved 3D blade, stem, midrib, and side veins.
-- `js/src/leaves.js` lights, rotates, and drifts seasonal copies of that model.
+- `js/src/leaf-model.js` builds a folded 3D blade with curled edges and tip,
+  darker reverse, stem, midrib, and side veins.
+- `js/src/leaves.js` lights, rotates, and drifts seasonal copies of that model
+  with a perspective camera, so nearby leaves appear larger. The ASCII pass
+  preserves the bright seasonal colors and directional highlight/shadow range.
 - `js/src/leaf-interaction.js` detects pointer hovers without intercepting page
   clicks. A leaf freezes, shakes for about 0.8 seconds, then splits into two
   smaller leaves sharing its exact color materials. They bounce apart and
