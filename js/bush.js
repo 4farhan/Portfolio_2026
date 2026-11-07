@@ -1,19 +1,17 @@
 (() => {
   // ── Leaf Bush Easter Egg ──
-  // A flowering hedge at the very bottom of the page. Hovering makes it
-  // giggle, a pair of eyes peeks out, and a bubble asks to be clicked.
+  // A pixel-art flowering shrub at the very bottom of the page. Hovering
+  // makes it giggle and a pair of eyes peeks out; a bubble shows how many
+  // times it has been clicked.
   const spot = document.getElementById('bush-spot');
   if (!spot) return;
 
   const bush = spot.querySelector('.bush');
   const canvas = spot.querySelector('.bush-canvas');
   const eyes = spot.querySelector('.bush-eyes');
-  const pupils = [...spot.querySelectorAll('.bush-pupil')];
-  const hintText = spot.querySelector('.bush-bubble-hint .bush-bubble-text');
   const counter = spot.querySelector('.bush-bubble-count');
   const countEl = spot.querySelector('.bush-count');
   const countLabel = spot.querySelector('.bush-count-label');
-  const backdrop = document.getElementById('bush-backdrop');
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   // Bush footprint inside .bush (CSS px). The canvas overhangs it by PAD_X /
@@ -315,7 +313,85 @@
     // Eyes ride along with the leaves around them.
     const scale = bush.clientWidth / W;
     const eyeLift = 0.55;
-    eyes.style.translate = `${(sway * Math.pow(eyeLift, 1.5)) * scale}px ${(-H * eyeLift * stretch) * scale}px`;
+    const cellPx = cell * scale;
+    const eyeX = Math.round((sway * Math.pow(eyeLift, 1.5) * scale) / cellPx) * cellPx;
+    const eyeY = Math.round((-H * eyeLift * stretch * scale) / cellPx) * cellPx;
+    eyes.style.translate = `${eyeX}px ${eyeY}px`;
+    drawEyes();
+  }
+
+  // ── Pixel-art eyes ──
+  // Plotted pixel by pixel (each pixel is either inside a shape or not) at
+  // the same pixel size as the bush, so edges stay crisp like hand-made
+  // pixel art.
+  const EYE_W = 34;
+  const EYE_H = 28;
+  eyes.width = EYE_W;
+  eyes.height = EYE_H;
+  const eyeContext = eyes.getContext('2d');
+  const eyePixels = eyeContext.createImageData(EYE_W, EYE_H);
+  const WHITE = [255, 255, 255];
+  const INK = [17, 17, 17];
+  const RED = [232, 35, 28];
+  const look = { x: 0, y: 1 };
+  let blinkUntil = 0;
+  let surprisedUntil = 0;
+
+  function plot(x, y, color) {
+    if (x < 0 || y < 0 || x >= EYE_W || y >= EYE_H) return;
+    const o = (y * EYE_W + x) * 4;
+    eyePixels.data[o] = color[0];
+    eyePixels.data[o + 1] = color[1];
+    eyePixels.data[o + 2] = color[2];
+    eyePixels.data[o + 3] = 255;
+  }
+
+  function fillEllipse(cx, cy, rx, ry, color) {
+    for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y += 1) {
+      for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x += 1) {
+        const nx = (x + 0.5 - cx) / rx;
+        const ny = (y + 0.5 - cy) / ry;
+        if (nx * nx + ny * ny <= 1) plot(x, y, color);
+      }
+    }
+  }
+
+  function drawEye(cx, cy, closed) {
+    if (closed) {
+      fillEllipse(cx, cy + 2, 8, 2.6, WHITE);
+      fillEllipse(cx, cy + 2, 7, 1.5, INK);
+      return;
+    }
+    fillEllipse(cx, cy, 8, 10, WHITE);
+    fillEllipse(cx, cy, 7, 9, INK);
+    fillEllipse(cx, cy + 0.5, 4.6, 6.6, WHITE);
+    const px = cx + Math.max(-2, Math.min(2, Math.round(look.x)));
+    const py = cy + 1 + Math.max(-3, Math.min(2, Math.round(look.y)));
+    fillEllipse(px, py, 2.7, 3.7, RED);
+    fillEllipse(px, py, 1.6, 2.6, INK);
+    plot(Math.floor(px), Math.floor(py) - 2, WHITE);
+  }
+
+  function drawBrow(from, to, lift, tilt) {
+    for (let x = from; x <= to; x += 1) {
+      const t = (x - from) / (to - from);
+      const y = Math.round(4 + lift - Math.sin(Math.PI * t) * 2 + (t - 0.5) * tilt);
+      plot(x, y, INK);
+      plot(x, y + 1, INK);
+    }
+  }
+
+  function drawEyes() {
+    const now = performance.now();
+    const closed = now < blinkUntil;
+    const surprised = now < surprisedUntil;
+    const lift = surprised ? -2 : closed ? 1 : 0;
+    eyePixels.data.fill(0);
+    drawEye(10, 17, closed);
+    drawEye(24, 17, closed);
+    drawBrow(3, 16, lift, surprised ? -2 : 2);
+    drawBrow(18, 31, lift, surprised ? 2 : -2);
+    eyeContext.putImageData(eyePixels, 0, 0);
   }
 
   function step(dt) {
@@ -397,41 +473,9 @@
 
   function renderCount() {
     countEl.textContent = count.toLocaleString();
-    countLabel.textContent = count === 1 ? 'click' : 'clicks';
-    spot.classList.toggle('has-count', count > 0);
+    countLabel.textContent = count === 1 ? 'click in my lifetime!' : 'clicks in my lifetime!';
   }
   renderCount();
-
-  // ── Gingham backdrop that spreads out from the bush ──
-  // The circle's centre is pinned to the bush *before* it starts growing,
-  // otherwise the first reveal would sweep in from the default corner.
-  function aimBackdrop() {
-    if (!backdrop) return;
-    const rect = bush.getBoundingClientRect();
-    // Move the centre instantly; only the radius should ever animate.
-    backdrop.style.transition = 'none';
-    backdrop.style.setProperty('--bx', `${rect.left + rect.width / 2}px`);
-    backdrop.style.setProperty('--by', `${rect.top + rect.height * 0.55}px`);
-    getComputedStyle(backdrop).clipPath; // commit before transitions return
-    backdrop.style.transition = '';
-  }
-  function openBackdrop() {
-    if (!backdrop) return;
-    if (!backdrop.classList.contains('is-open')) aimBackdrop();
-    backdrop.classList.add('is-open');
-    document.documentElement.classList.add('bush-picnic');
-  }
-  function closeBackdrop() {
-    if (!backdrop) return;
-    backdrop.classList.remove('is-open');
-    document.documentElement.classList.remove('bush-picnic');
-  }
-  aimBackdrop();
-  const reaim = () => {
-    if (backdrop && !backdrop.classList.contains('is-open')) aimBackdrop();
-  };
-  window.addEventListener('scroll', reaim, { passive: true });
-  window.addEventListener('resize', reaim);
 
   // ── Peek / hide ──
   let hideTimer = 0;
@@ -439,7 +483,6 @@
     clearTimeout(hideTimer);
     hovering = true;
     spot.classList.add('is-peeking');
-    openBackdrop();
     nextGiggle = clock;
     start();
   }
@@ -448,8 +491,9 @@
     clearTimeout(hideTimer);
     hideTimer = setTimeout(() => {
       spot.classList.remove('is-peeking');
-      closeBackdrop();
-      pupils.forEach((pupil) => pupil.setAttribute('transform', restingGaze));
+      look.x = 0;
+      look.y = 1;
+      drawEyes();
     }, delay);
   }
 
@@ -465,7 +509,6 @@
   bush.addEventListener('blur', () => hide(300));
 
   // ── Eyes follow the pointer together and blink ──
-  const restingGaze = 'translate(0 2.5)';
   window.addEventListener('pointermove', (event) => {
     if (!spot.classList.contains('is-peeking')) return;
     const rect = eyes.getBoundingClientRect();
@@ -473,32 +516,24 @@
     const dy = event.clientY - (rect.top + rect.height / 2);
     const distance = Math.hypot(dx, dy) || 1;
     const reach = Math.min(1, distance / 140);
-    const gaze = `translate(${((dx / distance) * 3.4 * reach).toFixed(2)} ${((dy / distance) * 4.6 * reach).toFixed(2)})`;
-    pupils.forEach((pupil) => pupil.setAttribute('transform', gaze));
+    look.x = (dx / distance) * 1.8 * reach;
+    look.y = (dy / distance) * 2.4 * reach;
+    if (!rafId) drawEyes();
   }, { passive: true });
 
   (function scheduleBlink() {
     setTimeout(() => {
       if (spot.classList.contains('is-peeking')) {
-        eyes.classList.add('is-blinking');
-        setTimeout(() => eyes.classList.remove('is-blinking'), 140);
+        blinkUntil = performance.now() + 140;
+        drawEyes();
+        setTimeout(drawEyes, 150);
       }
       scheduleBlink();
     }, 1800 + Math.random() * 2600);
   })();
 
   // ── Clicking ──
-  const milestones = {
-    1: 'Hehe! Again!',
-    10: 'That tickles!',
-    25: "Okay okay, I'm awake!",
-    50: 'Best friends now 🍂',
-    100: 'Legendary leaf poker!',
-    250: 'Please, I have a family',
-    500: 'You absolute legend'
-  };
-  const giggles = ['Hehe!', 'Teehee!', 'Eep!', 'Again!', 'Hoho!', 'Wheee!'];
-  let textTimer = 0;
+  const milestones = new Set([1, 10, 25, 50, 100, 250, 500, 1000]);
 
   function burst() {
     if (motion.matches) return;
@@ -507,11 +542,11 @@
       bit.className = 'bush-bit';
       const petal = Math.random() < 0.35;
       bit.classList.toggle('is-petal', petal);
-      bit.style.background = petal ? (Math.random() < 0.5 ? '#ef5fa7' : '#f3b6d4') : `hsl(${98 + Math.random() * 14} 52% ${40 + Math.random() * 22}%)`;
+      bit.style.background = petal ? (Math.random() < 0.5 ? '#ef4f98' : '#ee4b66') : `hsl(${104 + Math.random() * 16} 70% ${36 + Math.random() * 22}%)`;
       spot.appendChild(bit);
       const dx = (Math.random() - 0.5) * 140;
       const dy = -40 - Math.random() * 60;
-      const spin = (Math.random() - 0.5) * 540;
+      const spin = Math.round((Math.random() - 0.5) * 4) * 90;
       bit.animate([
         { transform: 'translate(-50%, 0) rotate(0deg) scale(0.6)', opacity: 1 },
         { transform: `translate(calc(-50% + ${dx}px), ${dy}px) rotate(${spin}deg) scale(1.1)`, opacity: 1, offset: 0.55 },
@@ -586,30 +621,25 @@
     } catch (error) { /* audio unavailable */ }
   }
 
-  let surpriseTimer = 0;
   bush.addEventListener('click', () => {
     count += 1;
-    sound(Boolean(milestones[count]));
-    eyes.classList.add('is-surprised');
-    clearTimeout(surpriseTimer);
-    surpriseTimer = setTimeout(() => eyes.classList.remove('is-surprised'), 420);
     try {
       localStorage.setItem(STORAGE_KEY, String(count));
     } catch (error) { /* storage unavailable */ }
     renderCount();
+    sound(milestones.has(count));
+    surprisedUntil = performance.now() + 420;
     peek();
     kick(1.5);
     burst();
-
-    hintText.textContent = milestones[count] || giggles[Math.floor(Math.random() * giggles.length)];
-    clearTimeout(textTimer);
-    textTimer = setTimeout(() => { hintText.textContent = 'Click the bush!'; }, 1400);
+    drawEyes();
+    setTimeout(drawEyes, 430);
 
     counter.classList.add('is-lit');
     clearTimeout(counter.litTimer);
     counter.litTimer = setTimeout(() => counter.classList.remove('is-lit'), 700);
     if (!motion.matches) {
-      counter.animate([{ transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'cubic-bezier(.34,1.8,.5,1)' });
+      counter.animate([{ transform: 'scale(1.15)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'cubic-bezier(.34,1.8,.5,1)' });
     }
 
     // Touch screens have no hover, so tuck the eyes away after a moment.

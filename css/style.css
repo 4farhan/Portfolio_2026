@@ -26,11 +26,6 @@ html {
   background: #ffffff;
 }
 
-/* Default colour fade for the bush's picnic mode. Kept up here so component
-   rules further down still set their own transitions. */
-.container * {
-  transition: color 0.35s ease;
-}
 
 /* Leaf Canvas */
 #leaves-canvas {
@@ -714,69 +709,12 @@ footer {
   position: absolute;
   left: 50%;
   top: 47%;
-  width: 44%;
-  overflow: visible;
+  width: 50%;
+  image-rendering: pixelated;
   pointer-events: none;
   opacity: 0;
   transform: translate(-50%, -30%) scale(0.2, 0.05);
   transition: opacity 0.15s ease, transform 0.22s ease-in;
-}
-
-.bush-hollow {
-  fill: rgba(18, 52, 22, 0.55);
-  filter: blur(3px);
-}
-
-.bush-eye {
-  transform-box: fill-box;
-  transform-origin: center;
-  transition: transform 0.07s ease;
-}
-
-.bush-eyes.is-blinking .bush-eye {
-  transform: scaleY(0.08);
-}
-
-.bush-brow {
-  fill: none;
-  stroke: #1a120c;
-  stroke-width: 4;
-  stroke-linecap: round;
-  transform-box: fill-box;
-  transform-origin: center;
-  transition: transform 0.25s cubic-bezier(0.34, 1.8, 0.5, 1);
-}
-
-/* Brows lift as the eyes pop out, and jump on every click. */
-.bush-spot:not(.is-peeking) .bush-brow {
-  transform: translateY(6px);
-}
-
-.bush-eyes.is-blinking .bush-brow {
-  transform: translateY(3px);
-}
-
-.bush-eyes.is-surprised .bush-brow-left {
-  transform: translateY(-5px) rotate(-10deg);
-}
-
-.bush-eyes.is-surprised .bush-brow-right {
-  transform: translateY(-5px) rotate(10deg);
-}
-
-/* While the gingham is out, every bit of text, icon and the signature turns
-   solid black so it reads clearly on the cloth. */
-html.bush-picnic .container,
-html.bush-picnic .container * {
-  color: #000 !important;
-}
-
-html.bush-picnic .replay-btn {
-  border-color: #000 !important;
-}
-
-html.bush-picnic .signature-svg g {
-  stroke: #000;
 }
 
 .bush-spot.is-peeking .bush-eyes {
@@ -831,32 +769,16 @@ html.bush-picnic .signature-svg g {
   --glow: 0 0 5px rgba(58, 185, 231, 0.75);
 }
 
-.bush-bubble-hint {
-  right: 18px;
-  bottom: calc(100% + 4px);
+.bush-bubble-count {
+  right: 4px;
+  bottom: calc(100% + 6px);
   transform-origin: 85% 120%;
 }
 
-.bush-bubble-hint::after {
-  right: 26px;
+.bush-bubble-count::after {
+  right: 34px;
   bottom: -8px;
   transform: rotate(45deg);
-}
-
-.bush-bubble-count {
-  right: calc(100% + 10px);
-  bottom: 34px;
-  border-radius: 16px;
-  transform-origin: 115% 50%;
-  font-variant-numeric: tabular-nums;
-}
-
-.bush-bubble-count::after {
-  right: -8px;
-  top: 50%;
-  margin-top: -7px;
-  background: linear-gradient(225deg, #f3f6f8, #eef2f5);
-  transform: rotate(-45deg);
 }
 
 .bush-count {
@@ -867,60 +789,30 @@ html.bush-picnic .signature-svg g {
 }
 
 .bush-count-label {
-  color: #8a959b;
-  font-size: 13px;
+  color: #6b767c;
+  font-size: 14px;
 }
 
-.bush-spot.is-peeking .bush-bubble-hint,
-.bush-spot.is-peeking.has-count .bush-bubble-count {
+.bush-spot.is-peeking .bush-bubble-count {
   opacity: 1;
   transform: scale(1);
   transition: opacity 0.15s ease 0.35s, transform 0.45s cubic-bezier(0.34, 1.7, 0.5, 1) 0.35s, border-color 0.2s ease, filter 0.25s ease;
-}
-
-.bush-spot.is-peeking.has-count .bush-bubble-count {
-  transition-delay: 0.5s, 0.5s, 0s, 0s;
 }
 
 .bush-bit {
   position: absolute;
   left: 50%;
   top: 30%;
-  width: 11px;
-  height: 11px;
-  border-radius: 0 100% 0 100%;
-  box-shadow: inset -1px -1px 0 rgba(0, 0, 0, 0.12);
+  width: 7.5px;
+  height: 7.5px;
+  box-shadow: inset -2.5px -2.5px 0 rgba(0, 0, 0, 0.18);
   pointer-events: none;
 }
 
 .bush-bit.is-petal {
-  width: 8px;
-  height: 8px;
-  border-radius: 50% 50% 50% 0;
-}
-
-/* Picnic gingham that spreads out from the bush */
-.bush-backdrop {
-  position: fixed;
-  inset: 0;
-  /* Above the opaque leaf canvas, multiplied so the leaves show through. */
-  z-index: 1;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-  background-color: #fdf2cf;
-  background-image:
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 4px),
-    conic-gradient(from 0deg at 50% 50%, transparent 0 75%, #f6be8e 75% 100%),
-    linear-gradient(90deg, #f8dc95 50%, transparent 50%),
-    linear-gradient(#f8dc95 50%, transparent 50%);
-  background-size: auto, 64px 64px, 64px 64px, 64px 64px;
-  clip-path: circle(0 at var(--bx, 100%) var(--by, 100%));
-  transition: clip-path 0.55s cubic-bezier(0.55, 0, 0.8, 0.35);
-}
-
-.bush-backdrop.is-open {
-  clip-path: circle(150vmax at var(--bx, 100%) var(--by, 100%));
-  transition: clip-path 1.2s cubic-bezier(0.2, 0.75, 0.25, 1);
+  width: 5px;
+  height: 5px;
+  box-shadow: none;
 }
 
 @media (max-width: 640px) {
@@ -940,22 +832,10 @@ html.bush-picnic .signature-svg g {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bush-backdrop,
-  .bush-backdrop.is-open {
-    clip-path: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .bush-backdrop.is-open {
-    opacity: 1;
-  }
-
   .bush-eyes,
   .bush-bubble,
   .bush-spot.is-peeking .bush-eyes,
-  .bush-spot.is-peeking .bush-bubble-hint,
-  .bush-spot.is-peeking.has-count .bush-bubble-count {
+  .bush-spot.is-peeking .bush-bubble-count {
     transition: opacity 0.2s ease;
   }
 }
