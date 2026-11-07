@@ -26,6 +26,12 @@ html {
   background: #ffffff;
 }
 
+/* Default colour fade for the bush's picnic mode. Kept up here so component
+   rules further down still set their own transitions. */
+.container * {
+  transition: color 0.35s ease;
+}
+
 /* Leaf Canvas */
 #leaves-canvas {
   position: fixed;
@@ -657,8 +663,8 @@ footer {
   position: absolute;
   right: clamp(16px, 4vw, 56px);
   bottom: 0;
-  width: 180px;
-  height: 124px;
+  width: 170px;
+  height: 150px;
   z-index: 5;
 }
 
@@ -698,21 +704,16 @@ footer {
 }
 
 .bush-canvas {
-  /* Overhangs the bush by 12px each side and 14px on top (at 180x124) so
-     the wobble has room to sway without clipping. */
+  /* Overhangs the bush (sized in bush.js) so the wobble never clips. */
   position: absolute;
-  left: -6.667%;
-  top: -11.29%;
-  width: 113.333%;
-  height: 111.29%;
   display: block;
 }
 
 .bush-eyes {
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: 40%;
+  top: 47%;
+  width: 44%;
   overflow: visible;
   pointer-events: none;
   opacity: 0;
@@ -733,6 +734,48 @@ footer {
 
 .bush-eyes.is-blinking .bush-eye {
   transform: scaleY(0.08);
+}
+
+.bush-brow {
+  fill: none;
+  stroke: #1a120c;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.25s cubic-bezier(0.34, 1.8, 0.5, 1);
+}
+
+/* Brows lift as the eyes pop out, and jump on every click. */
+.bush-spot:not(.is-peeking) .bush-brow {
+  transform: translateY(6px);
+}
+
+.bush-eyes.is-blinking .bush-brow {
+  transform: translateY(3px);
+}
+
+.bush-eyes.is-surprised .bush-brow-left {
+  transform: translateY(-5px) rotate(-10deg);
+}
+
+.bush-eyes.is-surprised .bush-brow-right {
+  transform: translateY(-5px) rotate(10deg);
+}
+
+/* While the gingham is out, every bit of text, icon and the signature turns
+   solid black so it reads clearly on the cloth. */
+html.bush-picnic .container,
+html.bush-picnic .container * {
+  color: #000 !important;
+}
+
+html.bush-picnic .replay-btn {
+  border-color: #000 !important;
+}
+
+html.bush-picnic .signature-svg g {
+  stroke: #000;
 }
 
 .bush-spot.is-peeking .bush-eyes {
@@ -885,8 +928,8 @@ footer {
   }
 
   .bush-spot {
-    width: 140px;
-    height: 96px;
+    width: 124px;
+    height: 110px;
   }
 
   .bush-bubble {

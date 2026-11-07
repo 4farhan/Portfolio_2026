@@ -18,9 +18,9 @@
 
   // Bush footprint inside .bush (CSS px). The canvas overhangs it by PAD_X /
   // PAD_TOP so the springy sway never clips at the edges.
-  const W = 180;
-  const H = 124;
-  const PAD_X = 12;
+  const W = 170;
+  const H = 150;
+  const PAD_X = 14;
   const PAD_TOP = 14;
   const CW = W + PAD_X * 2;
   const CH = H + PAD_TOP;
@@ -32,41 +32,54 @@
     return (seed - 1) / 2147483646;
   };
 
-  // Rows of broad leaves pointing down like shingles, laid from the bottom of
-  // the dome up so each row's tips rest over the row beneath it.
+  // A round shrub: rings of broad leaves fanning outward from the middle,
+  // laid outer ring first so inner leaves overlap them and the silhouette
+  // stays a fringe of leaf tips.
   const leaves = [];
   const cx = W / 2;
-  const domeHeight = H - 10;
-  for (let row = 0, y = H - 12; y > 13; row += 1, y -= 9.5) {
-    const rise = (H - y) / domeHeight;
-    const halfSpan = (W / 2 - 18) * Math.sqrt(Math.max(0, 1 - rise * rise));
-    const step = 15;
-    const offset = row % 2 ? step / 2 : 0;
-    for (let x = cx - halfSpan + offset; x <= cx + halfSpan + 0.1; x += step) {
-      const px = x + (rand() - 0.5) * 4;
-      const py = y + (rand() - 0.5) * 3;
-      const side = (px - cx) / (W / 2);
-      const height = 1 - py / H;
+  const cy = H * 0.5;
+  const rx = W / 2 - 20;
+  const ry = H / 2 - 20;
+  const domeHeight = H - 6;
+  for (let ring = 1; ring >= 0.12; ring -= 0.16) {
+    const circumference = Math.PI * (rx + ry) * ring;
+    const count = Math.max(3, Math.round(circumference / 15));
+    const turn = rand() * Math.PI * 2;
+    for (let i = 0; i < count; i += 1) {
+      const a = turn + (i / count) * Math.PI * 2;
+      const x = cx + Math.cos(a) * rx * ring + (rand() - 0.5) * 5;
+      // Squash the top a little and let the bottom flare out.
+      const y = cy + Math.sin(a) * ry * ring * (Math.sin(a) > 0 ? 1.08 : 0.95) + (rand() - 0.5) * 5;
+      const outward = ring > 0.3 ? a : Math.PI / 2 + (rand() - 0.5) * 2;
+      const lightFromTopLeft = 1 - ((y / H) * 0.7 + (x / W) * 0.3);
       leaves.push({
-        x: px,
-        y: py,
-        angle: -side * 0.7 + (rand() - 0.5) * 0.3,
-        length: 25 + rand() * 6 + (1 - height) * 3,
-        width: 10.5 + rand() * 2.5,
-        hue: 96 + rand() * 16,
-        light: 36 + height * 22 + (rand() - 0.5) * 7
+        x,
+        y,
+        // Leaf tips point along +y in leaf space, so turn +y toward `outward`.
+        angle: outward - Math.PI / 2 + (rand() - 0.5) * 0.4,
+        length: 27 + rand() * 7,
+        width: 11.5 + rand() * 2.5,
+        hue: 104 + rand() * 16,
+        light: 30 + lightFromTopLeft * 26 + (1 - ring) * 6 + (rand() - 0.5) * 8
       });
     }
   }
 
+  // Big five-petal flowers, ringed around the middle so the eyes have room.
   const flowers = [
-    [0.25, 0.6, 'hot'], [0.15, 0.82, 'hot'], [0.36, 0.86, 'hot'],
-    [0.75, 0.58, 'pale'], [0.86, 0.8, 'pale'], [0.64, 0.87, 'pale']
-  ].map(([fx, fy, tone]) => ({ x: fx * W, y: fy * H, tone, radius: 9.5 + rand() * 2, spin: rand() * Math.PI }));
+    [0.31, 0.2, 'pink'], [0.64, 0.17, 'coral'], [0.83, 0.43, 'pink'],
+    [0.18, 0.5, 'coral'], [0.71, 0.72, 'coral'], [0.32, 0.76, 'pink']
+  ].map(([fx, fy, tone]) => ({ x: fx * W, y: fy * H, tone, radius: 15 + rand() * 2.5, spin: rand() * Math.PI }));
 
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   canvas.width = CW * dpr;
   canvas.height = CH * dpr;
+  Object.assign(canvas.style, {
+    left: `${(-PAD_X / W) * 100}%`,
+    top: `${(-PAD_TOP / H) * 100}%`,
+    width: `${(CW / W) * 100}%`,
+    height: `${(CH / H) * 100}%`
+  });
   const context = canvas.getContext('2d');
 
   // ── Paint the bush once, softly shaded, into an offscreen image ──
@@ -87,9 +100,9 @@
     const top = -length / 2;
     leafPath(length, width);
     const body = paint.createLinearGradient(0, top, 0, length / 2);
-    body.addColorStop(0, `hsl(${hue + 6} 48% ${light - 9}%)`);
-    body.addColorStop(0.45, `hsl(${hue} 56% ${light + 5}%)`);
-    body.addColorStop(1, `hsl(${hue - 4} 52% ${light - 1}%)`);
+    body.addColorStop(0, `hsl(${hue + 6} 72% ${light - 10}%)`);
+    body.addColorStop(0.5, `hsl(${hue - 6} 70% ${light + 6}%)`);
+    body.addColorStop(1, `hsl(${hue - 10} 74% ${light + 1}%)`);
     paint.shadowColor = 'rgba(10, 38, 12, 0.5)';
     paint.shadowBlur = 5 * dpr;
     paint.shadowOffsetY = 2 * dpr;
@@ -120,43 +133,72 @@
   }
 
   function paintFlower({ radius, tone }) {
-    const inner = tone === 'hot' ? '#b82a72' : '#cf6f9f';
-    const mid = tone === 'hot' ? '#ee5aa4' : '#f2b2d2';
-    const tip = tone === 'hot' ? '#ffa6d1' : '#fff3f8';
-    paint.beginPath();
-    for (let k = 0; k < 5; k += 1) {
-      const a = -Math.PI / 2 + (k * Math.PI * 2) / 5;
-      paint.moveTo(0, 0);
-      paint.quadraticCurveTo(Math.cos(a - 0.55) * radius * 0.7, Math.sin(a - 0.55) * radius * 0.7, Math.cos(a) * radius, Math.sin(a) * radius);
-      paint.quadraticCurveTo(Math.cos(a + 0.55) * radius * 0.7, Math.sin(a + 0.55) * radius * 0.7, 0, 0);
-    }
+    const edge = tone === 'pink' ? '#ff8fc4' : '#ff8a8f';
+    const mid = tone === 'pink' ? '#ef4f98' : '#ee4b66';
+    const deep = tone === 'pink' ? '#b81d63' : '#b81c3a';
+    const petalPath = () => {
+      paint.beginPath();
+      for (let k = 0; k < 5; k += 1) {
+        const a = -Math.PI / 2 + (k * Math.PI * 2) / 5;
+        // Broad petal with a soft point, like a hibiscus.
+        paint.moveTo(0, 0);
+        paint.bezierCurveTo(
+          Math.cos(a - 0.9) * radius * 0.85, Math.sin(a - 0.9) * radius * 0.85,
+          Math.cos(a - 0.3) * radius * 1.08, Math.sin(a - 0.3) * radius * 1.08,
+          Math.cos(a) * radius, Math.sin(a) * radius
+        );
+        paint.bezierCurveTo(
+          Math.cos(a + 0.3) * radius * 1.08, Math.sin(a + 0.3) * radius * 1.08,
+          Math.cos(a + 0.9) * radius * 0.85, Math.sin(a + 0.9) * radius * 0.85,
+          0, 0
+        );
+      }
+    };
+    petalPath();
     const petals = paint.createRadialGradient(0, 0, 0, 0, 0, radius);
-    petals.addColorStop(0, inner);
-    petals.addColorStop(0.32, mid);
-    petals.addColorStop(1, tip);
-    paint.shadowColor = 'rgba(20, 45, 15, 0.45)';
-    paint.shadowBlur = 4 * dpr;
-    paint.shadowOffsetY = 1.5 * dpr;
+    petals.addColorStop(0, '#5a0a26');
+    petals.addColorStop(0.2, deep);
+    petals.addColorStop(0.55, mid);
+    petals.addColorStop(1, edge);
+    paint.shadowColor = 'rgba(15, 50, 10, 0.5)';
+    paint.shadowBlur = 5 * dpr;
+    paint.shadowOffsetY = 2 * dpr;
     paint.fillStyle = petals;
     paint.fill();
     paint.shadowColor = 'transparent';
 
-    paint.globalAlpha = 0.55;
-    paint.strokeStyle = inner;
-    paint.lineWidth = 0.7;
-    for (let k = 0; k < 5; k += 1) {
-      const a = -Math.PI / 2 + (k * Math.PI * 2) / 5;
-      paint.beginPath();
-      paint.moveTo(0, 0);
-      paint.lineTo(Math.cos(a) * radius * 0.5, Math.sin(a) * radius * 0.5);
-      paint.stroke();
-    }
-    paint.globalAlpha = 1;
+    // Light catches the upper-left petals.
+    paint.save();
+    petalPath();
+    paint.clip();
+    const sheen = paint.createRadialGradient(-radius * 0.45, -radius * 0.5, 0, -radius * 0.45, -radius * 0.5, radius * 0.9);
+    sheen.addColorStop(0, 'rgba(255, 235, 245, 0.45)');
+    sheen.addColorStop(1, 'rgba(255, 235, 245, 0)');
+    paint.fillStyle = sheen;
+    paint.fillRect(-radius, -radius, radius * 2, radius * 2);
+    paint.restore();
+
+    // Petal creases.
+    paint.strokeStyle = 'rgba(120, 10, 50, 0.35)';
+    paint.lineWidth = 0.8;
     for (let k = 0; k < 5; k += 1) {
       const a = -Math.PI / 2 + Math.PI / 5 + (k * Math.PI * 2) / 5;
       paint.beginPath();
-      paint.arc(Math.cos(a) * 2.6, Math.sin(a) * 2.6, 0.95, 0, Math.PI * 2);
-      paint.fillStyle = '#ffe680';
+      paint.moveTo(Math.cos(a) * radius * 0.25, Math.sin(a) * radius * 0.25);
+      paint.lineTo(Math.cos(a) * radius * 0.62, Math.sin(a) * radius * 0.62);
+      paint.stroke();
+    }
+
+    // Dark throat with a few pale stamens.
+    paint.beginPath();
+    paint.arc(0, 0, radius * 0.2, 0, Math.PI * 2);
+    paint.fillStyle = '#4a0820';
+    paint.fill();
+    for (let k = 0; k < 4; k += 1) {
+      const a = k * 1.7;
+      paint.beginPath();
+      paint.arc(Math.cos(a) * radius * 0.1, Math.sin(a) * radius * 0.1, 0.9, 0, Math.PI * 2);
+      paint.fillStyle = '#ffd3e6';
       paint.fill();
     }
   }
@@ -166,10 +208,10 @@
 
     // Dark leafy depth that shows through the gaps.
     paint.beginPath();
-    paint.ellipse(cx, H, W / 2 - 12, H - 14, 0, Math.PI, Math.PI * 2);
-    const depth = paint.createLinearGradient(0, 14, 0, H);
-    depth.addColorStop(0, '#3f8a34');
-    depth.addColorStop(1, '#1d4a1d');
+    paint.ellipse(cx, cy + 2, rx + 4, ry + 6, 0, 0, Math.PI * 2);
+    const depth = paint.createLinearGradient(0, cy - ry, 0, cy + ry);
+    depth.addColorStop(0, '#2f9a22');
+    depth.addColorStop(1, '#125a12');
     paint.fillStyle = depth;
     paint.fill();
 
@@ -191,16 +233,16 @@
     // Light the whole mound as one rounded volume.
     paint.globalCompositeOperation = 'source-atop';
     const volume = paint.createRadialGradient(W * 0.36, H * 0.22, 0, W * 0.36, H * 0.22, W * 0.85);
-    volume.addColorStop(0, 'rgba(255, 252, 210, 0.26)');
-    volume.addColorStop(0.45, 'rgba(255, 252, 210, 0)');
-    volume.addColorStop(1, 'rgba(8, 36, 12, 0.32)');
+    volume.addColorStop(0, 'rgba(240, 255, 170, 0.3)');
+    volume.addColorStop(0.45, 'rgba(240, 255, 170, 0)');
+    volume.addColorStop(1, 'rgba(6, 40, 8, 0.3)');
     paint.fillStyle = volume;
     paint.fillRect(-PAD_X, -PAD_TOP, CW, CH);
-    const ground = paint.createLinearGradient(0, H - 22, 0, H);
+    const ground = paint.createLinearGradient(0, H - 26, 0, H);
     ground.addColorStop(0, 'rgba(8, 32, 10, 0)');
     ground.addColorStop(1, 'rgba(8, 32, 10, 0.4)');
     paint.fillStyle = ground;
-    paint.fillRect(-PAD_X, H - 22, CW, 22);
+    paint.fillRect(-PAD_X, H - 26, CW, 26);
     paint.globalCompositeOperation = 'source-over';
   })();
 
@@ -234,7 +276,7 @@
 
     // Eyes ride along with the leaves around them.
     const scale = bush.clientWidth / W;
-    const eyeLift = 0.5;
+    const eyeLift = 0.55;
     eyes.style.translate = `${(sway * Math.pow(eyeLift, 1.5)) * scale}px ${(-H * eyeLift * stretch) * scale}px`;
   }
 
@@ -323,13 +365,35 @@
   renderCount();
 
   // ── Gingham backdrop that spreads out from the bush ──
-  function openBackdrop() {
+  // The circle's centre is pinned to the bush *before* it starts growing,
+  // otherwise the first reveal would sweep in from the default corner.
+  function aimBackdrop() {
     if (!backdrop) return;
     const rect = bush.getBoundingClientRect();
+    // Move the centre instantly; only the radius should ever animate.
+    backdrop.style.transition = 'none';
     backdrop.style.setProperty('--bx', `${rect.left + rect.width / 2}px`);
-    backdrop.style.setProperty('--by', `${rect.top + rect.height * 0.6}px`);
-    backdrop.classList.add('is-open');
+    backdrop.style.setProperty('--by', `${rect.top + rect.height * 0.55}px`);
+    getComputedStyle(backdrop).clipPath; // commit before transitions return
+    backdrop.style.transition = '';
   }
+  function openBackdrop() {
+    if (!backdrop) return;
+    if (!backdrop.classList.contains('is-open')) aimBackdrop();
+    backdrop.classList.add('is-open');
+    document.documentElement.classList.add('bush-picnic');
+  }
+  function closeBackdrop() {
+    if (!backdrop) return;
+    backdrop.classList.remove('is-open');
+    document.documentElement.classList.remove('bush-picnic');
+  }
+  aimBackdrop();
+  const reaim = () => {
+    if (backdrop && !backdrop.classList.contains('is-open')) aimBackdrop();
+  };
+  window.addEventListener('scroll', reaim, { passive: true });
+  window.addEventListener('resize', reaim);
 
   // ── Peek / hide ──
   let hideTimer = 0;
@@ -346,7 +410,7 @@
     clearTimeout(hideTimer);
     hideTimer = setTimeout(() => {
       spot.classList.remove('is-peeking');
-      backdrop?.classList.remove('is-open');
+      closeBackdrop();
       pupils.forEach((pupil) => pupil.setAttribute('transform', restingGaze));
     }, delay);
   }
@@ -418,8 +482,79 @@
     }
   }
 
+  // ── Sound: a springy pop and a leafy rustle, synthesised on the fly ──
+  let audio = null;
+  let noise = null;
+  function sound(milestone) {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      if (audio.state === 'suspended') audio.resume();
+      const now = audio.currentTime;
+      const out = audio.createGain();
+      out.gain.value = 0.5;
+      out.connect(audio.destination);
+
+      // Pop: a quick upward pitch bend, pitched a little differently each time.
+      const pitch = 420 * (0.85 + Math.random() * 0.4);
+      const pop = audio.createOscillator();
+      const popGain = audio.createGain();
+      pop.type = 'triangle';
+      pop.frequency.setValueAtTime(pitch, now);
+      pop.frequency.exponentialRampToValueAtTime(pitch * 2.1, now + 0.07);
+      pop.frequency.exponentialRampToValueAtTime(pitch * 1.4, now + 0.16);
+      popGain.gain.setValueAtTime(0.0001, now);
+      popGain.gain.exponentialRampToValueAtTime(0.32, now + 0.012);
+      popGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+      pop.connect(popGain).connect(out);
+      pop.start(now);
+      pop.stop(now + 0.22);
+
+      // Rustle: band-passed noise.
+      if (!noise) {
+        noise = audio.createBuffer(1, audio.sampleRate * 0.4, audio.sampleRate);
+        const data = noise.getChannelData(0);
+        for (let i = 0; i < data.length; i += 1) data[i] = Math.random() * 2 - 1;
+      }
+      const rustle = audio.createBufferSource();
+      rustle.buffer = noise;
+      const band = audio.createBiquadFilter();
+      band.type = 'bandpass';
+      band.frequency.value = 2600 + Math.random() * 1400;
+      band.Q.value = 0.9;
+      const rustleGain = audio.createGain();
+      rustleGain.gain.setValueAtTime(0.0001, now);
+      rustleGain.gain.exponentialRampToValueAtTime(0.22, now + 0.02);
+      rustleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+      rustle.connect(band).connect(rustleGain).connect(out);
+      rustle.start(now);
+      rustle.stop(now + 0.32);
+
+      // Milestones get a little rising chime.
+      if (milestone) {
+        [784, 988, 1319].forEach((freq, i) => {
+          const at = now + 0.12 + i * 0.09;
+          const tone = audio.createOscillator();
+          const toneGain = audio.createGain();
+          tone.type = 'sine';
+          tone.frequency.value = freq;
+          toneGain.gain.setValueAtTime(0.0001, at);
+          toneGain.gain.exponentialRampToValueAtTime(0.2, at + 0.01);
+          toneGain.gain.exponentialRampToValueAtTime(0.0001, at + 0.35);
+          tone.connect(toneGain).connect(out);
+          tone.start(at);
+          tone.stop(at + 0.4);
+        });
+      }
+    } catch (error) { /* audio unavailable */ }
+  }
+
+  let surpriseTimer = 0;
   bush.addEventListener('click', () => {
     count += 1;
+    sound(Boolean(milestones[count]));
+    eyes.classList.add('is-surprised');
+    clearTimeout(surpriseTimer);
+    surpriseTimer = setTimeout(() => eyes.classList.remove('is-surprised'), 420);
     try {
       localStorage.setItem(STORAGE_KEY, String(count));
     } catch (error) { /* storage unavailable */ }
