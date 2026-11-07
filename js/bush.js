@@ -265,6 +265,9 @@
     clearTimeout(textTimer);
     textTimer = setTimeout(() => { hintText.textContent = 'Click the bush!'; }, 1400);
 
+    counter.classList.add('is-lit');
+    clearTimeout(counter.litTimer);
+    counter.litTimer = setTimeout(() => counter.classList.remove('is-lit'), 700);
     if (!motion.matches) {
       counter.animate([{ transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'cubic-bezier(.34,1.8,.5,1)' });
     }

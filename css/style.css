@@ -738,27 +738,33 @@ footer {
   transition: opacity 0.12s ease 0.12s, transform 0.5s cubic-bezier(0.34, 1.9, 0.5, 1) 0.12s;
 }
 
-/* Wii-style speech bubbles */
+/* Wii-style speech bubbles
+   Silver-edged glossy panels: near white down to a soft line across the
+   middle, a shade darker below. A blue glow ring marks the "lit" one. */
 .bush-bubble {
+  --edge: #c7d0d6;
+  --gloss-bottom: #e6ecf0;
+  --glow: 0 0 0 transparent;
   position: absolute;
-  font-family: 'Nunito', ui-rounded, 'SF Pro Rounded', 'Arial Rounded MT Bold', system-ui, sans-serif;
+  font-family: 'M PLUS Rounded 1c', 'Nunito', ui-rounded, 'SF Pro Rounded', 'Arial Rounded MT Bold', system-ui, sans-serif;
   font-weight: 800;
   font-size: 15px;
   line-height: 1.2;
-  color: #3b4148;
+  letter-spacing: 0.01em;
+  color: #6b767c;
+  text-shadow: 0 1px 0 #ffffff;
   white-space: nowrap;
-  padding: 9px 16px;
-  background: linear-gradient(180deg, #ffffff 0%, #ffffff 45%, var(--bubble-end) 100%);
-  border: 2.5px solid var(--bush-blue);
-  border-radius: 20px;
-  box-shadow:
-    0 8px 18px rgba(52, 190, 237, 0.22),
-    0 2px 5px rgba(0, 0, 0, 0.06),
-    inset 0 2px 0 rgba(255, 255, 255, 0.95);
+  padding: 10px 18px 9px;
+  background: linear-gradient(180deg, #ffffff 0%, #fdfefe 47%, #eff3f6 53%, var(--gloss-bottom) 100%);
+  border: 2px solid var(--edge);
+  border-radius: 22px;
+  box-shadow: inset 0 1px 0 #ffffff, inset 0 -2px 3px rgba(150, 165, 175, 0.18);
+  /* drop-shadow follows the tail too, so the glow wraps the whole bubble */
+  filter: drop-shadow(var(--glow)) drop-shadow(0 4px 6px rgba(60, 80, 95, 0.16));
   pointer-events: none;
   opacity: 0;
   transform: scale(0.3);
-  transition: opacity 0.15s ease, transform 0.2s ease-in;
+  transition: opacity 0.15s ease, transform 0.2s ease-in, border-color 0.2s ease, filter 0.25s ease;
 }
 
 .bush-bubble::after {
@@ -766,10 +772,16 @@ footer {
   position: absolute;
   width: 12px;
   height: 12px;
-  background: var(--bubble-end);
-  border-right: 2.5px solid var(--bush-blue);
-  border-bottom: 2.5px solid var(--bush-blue);
+  background: var(--gloss-bottom);
+  border-right: 2px solid var(--edge);
+  border-bottom: 2px solid var(--edge);
   border-bottom-right-radius: 3px;
+  transition: border-color 0.2s ease;
+}
+
+.bush-bubble.is-lit {
+  --edge: #4bb9e9;
+  --glow: 0 0 5px rgba(58, 185, 231, 0.75);
 }
 
 .bush-bubble-hint {
@@ -787,6 +799,7 @@ footer {
 .bush-bubble-count {
   right: calc(100% + 10px);
   bottom: 34px;
+  border-radius: 16px;
   transform-origin: 115% 50%;
   font-variant-numeric: tabular-nums;
 }
@@ -795,18 +808,19 @@ footer {
   right: -8px;
   top: 50%;
   margin-top: -7px;
-  background: #f6fbfe;
+  background: linear-gradient(225deg, #f3f6f8, #eef2f5);
   transform: rotate(-45deg);
 }
 
 .bush-count {
-  font-weight: 900;
-  font-size: 18px;
-  color: #1aa3d6;
+  font-weight: 800;
+  font-size: 19px;
+  color: #34a9dc;
+  text-shadow: 0 1px 0 #ffffff;
 }
 
 .bush-count-label {
-  color: #7b8590;
+  color: #8a959b;
   font-size: 13px;
 }
 
@@ -814,11 +828,11 @@ footer {
 .bush-spot.is-peeking.has-count .bush-bubble-count {
   opacity: 1;
   transform: scale(1);
-  transition: opacity 0.15s ease 0.35s, transform 0.45s cubic-bezier(0.34, 1.7, 0.5, 1) 0.35s;
+  transition: opacity 0.15s ease 0.35s, transform 0.45s cubic-bezier(0.34, 1.7, 0.5, 1) 0.35s, border-color 0.2s ease, filter 0.25s ease;
 }
 
 .bush-spot.is-peeking.has-count .bush-bubble-count {
-  transition-delay: 0.5s;
+  transition-delay: 0.5s, 0.5s, 0s, 0s;
 }
 
 .bush-bit {
