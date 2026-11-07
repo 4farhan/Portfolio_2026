@@ -657,8 +657,8 @@ footer {
   position: absolute;
   right: clamp(16px, 4vw, 56px);
   bottom: 0;
-  width: 168px;
-  height: 104px;
+  width: 180px;
+  height: 124px;
   z-index: 5;
 }
 
@@ -682,7 +682,7 @@ footer {
   right: 8%;
   bottom: -4px;
   height: 14px;
-  background: radial-gradient(ellipse at center, rgba(48, 41, 24, 0.22), transparent 70%);
+  background: radial-gradient(ellipse at center, rgba(30, 60, 25, 0.28), transparent 70%);
   pointer-events: none;
 }
 
@@ -695,21 +695,24 @@ footer {
   position: absolute;
   inset: 0;
   display: block;
-  transform-origin: 50% 100%;
-  will-change: transform;
 }
 
 .bush-canvas {
+  /* Overhangs the bush by 12px each side and 14px on top (at 180x124) so
+     the wobble has room to sway without clipping. */
+  position: absolute;
+  left: -6.667%;
+  top: -11.29%;
+  width: 113.333%;
+  height: 111.29%;
   display: block;
-  width: 100%;
-  height: 100%;
 }
 
 .bush-eyes {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 36%;
+  width: 40%;
   overflow: visible;
   pointer-events: none;
   opacity: 0;
@@ -718,7 +721,7 @@ footer {
 }
 
 .bush-hollow {
-  fill: rgba(48, 30, 12, 0.32);
+  fill: rgba(18, 52, 22, 0.55);
   filter: blur(3px);
 }
 
@@ -839,9 +842,41 @@ footer {
   position: absolute;
   left: 50%;
   top: 30%;
-  font: bold 13px monospace;
+  width: 11px;
+  height: 11px;
+  border-radius: 0 100% 0 100%;
+  box-shadow: inset -1px -1px 0 rgba(0, 0, 0, 0.12);
   pointer-events: none;
-  text-shadow: 1.5px 2px 0 rgba(48, 41, 24, 0.14);
+}
+
+.bush-bit.is-petal {
+  width: 8px;
+  height: 8px;
+  border-radius: 50% 50% 50% 0;
+}
+
+/* Picnic gingham that spreads out from the bush */
+.bush-backdrop {
+  position: fixed;
+  inset: 0;
+  /* Above the opaque leaf canvas, multiplied so the leaves show through. */
+  z-index: 1;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  background-color: #fdf2cf;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 4px),
+    conic-gradient(from 0deg at 50% 50%, transparent 0 75%, #f6be8e 75% 100%),
+    linear-gradient(90deg, #f8dc95 50%, transparent 50%),
+    linear-gradient(#f8dc95 50%, transparent 50%);
+  background-size: auto, 64px 64px, 64px 64px, 64px 64px;
+  clip-path: circle(0 at var(--bx, 100%) var(--by, 100%));
+  transition: clip-path 0.55s cubic-bezier(0.55, 0, 0.8, 0.35);
+}
+
+.bush-backdrop.is-open {
+  clip-path: circle(150vmax at var(--bx, 100%) var(--by, 100%));
+  transition: clip-path 1.2s cubic-bezier(0.2, 0.75, 0.25, 1);
 }
 
 @media (max-width: 640px) {
@@ -850,8 +885,8 @@ footer {
   }
 
   .bush-spot {
-    width: 132px;
-    height: 82px;
+    width: 140px;
+    height: 96px;
   }
 
   .bush-bubble {
@@ -861,6 +896,17 @@ footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .bush-backdrop,
+  .bush-backdrop.is-open {
+    clip-path: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .bush-backdrop.is-open {
+    opacity: 1;
+  }
+
   .bush-eyes,
   .bush-bubble,
   .bush-spot.is-peeking .bush-eyes,

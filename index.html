@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <div class="bush-backdrop" id="bush-backdrop" aria-hidden="true"></div>
   <canvas id="leaves-canvas" aria-hidden="true"></canvas>
 
   <div class="container">
@@ -159,18 +160,22 @@
   <div class="bush-spot" id="bush-spot">
     <div class="bush-bubble bush-bubble-count" aria-live="polite"><span class="bush-count">0</span> <span class="bush-count-label">clicks</span></div>
     <div class="bush-bubble bush-bubble-hint is-lit"><span class="bush-bubble-text">Click the bush!</span></div>
-    <button class="bush" type="button" aria-label="A suspicious pile of leaves. Click it!">
+    <button class="bush" type="button" aria-label="A suspicious flowering bush. Click it!">
       <span class="bush-body">
         <canvas class="bush-canvas" aria-hidden="true"></canvas>
-        <svg class="bush-eyes" viewBox="0 0 60 36" aria-hidden="true">
-          <ellipse class="bush-hollow" cx="30" cy="19" rx="23" ry="13"/>
+        <svg class="bush-eyes" viewBox="0 0 66 46" aria-hidden="true">
+          <ellipse class="bush-hollow" cx="33" cy="24" rx="30" ry="21"/>
           <g class="bush-eye">
-            <ellipse cx="19" cy="18" rx="9" ry="11.5" fill="#fff" stroke="#1d1d1f" stroke-width="2"/>
-            <g class="bush-pupil-wrap" transform="translate(20 19)"><g class="bush-pupil"><ellipse rx="4.6" ry="6.2" fill="#1d1d1f"/><circle cx="-1.6" cy="-2.6" r="1.7" fill="#fff"/><circle cx="1.7" cy="2.3" r="0.8" fill="#fff"/></g></g>
+            <ellipse cx="21" cy="23" rx="16" ry="21" fill="#fff"/>
+            <ellipse cx="21" cy="23" rx="14.4" ry="19.4" fill="#161616"/>
+            <ellipse cx="21" cy="23.6" rx="9.8" ry="14" fill="#fff"/>
+            <g class="bush-pupil-wrap" transform="translate(21 24)"><g class="bush-pupil" transform="translate(0 2.5)"><ellipse rx="5" ry="7.4" fill="#ed3024"/><ellipse rx="3.3" ry="5.6" fill="#1e1416"/><circle cy="-3.4" r="1.6" fill="#fff"/></g></g>
           </g>
           <g class="bush-eye">
-            <ellipse cx="41" cy="18" rx="9" ry="11.5" fill="#fff" stroke="#1d1d1f" stroke-width="2"/>
-            <g class="bush-pupil-wrap" transform="translate(40 19)"><g class="bush-pupil"><ellipse rx="4.6" ry="6.2" fill="#1d1d1f"/><circle cx="-1.6" cy="-2.6" r="1.7" fill="#fff"/><circle cx="1.7" cy="2.3" r="0.8" fill="#fff"/></g></g>
+            <ellipse cx="45" cy="23" rx="16" ry="21" fill="#fff"/>
+            <ellipse cx="45" cy="23" rx="14.4" ry="19.4" fill="#161616"/>
+            <ellipse cx="45" cy="23.6" rx="9.8" ry="14" fill="#fff"/>
+            <g class="bush-pupil-wrap" transform="translate(45 24)"><g class="bush-pupil" transform="translate(0 2.5)"><ellipse rx="5" ry="7.4" fill="#ed3024"/><ellipse rx="3.3" ry="5.6" fill="#1e1416"/><circle cy="-3.4" r="1.6" fill="#fff"/></g></g>
           </g>
         </svg>
       </span>
