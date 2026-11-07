@@ -707,6 +707,7 @@ footer {
   /* Overhangs the bush (sized in bush.js) so the wobble never clips. */
   position: absolute;
   display: block;
+  image-rendering: pixelated;
 }
 
 .bush-eyes {

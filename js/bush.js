@@ -41,9 +41,9 @@
   const rx = W / 2 - 20;
   const ry = H / 2 - 20;
   const domeHeight = H - 6;
-  for (let ring = 1; ring >= 0.12; ring -= 0.16) {
+  for (let ring = 1; ring >= 0.15; ring -= 0.21) {
     const circumference = Math.PI * (rx + ry) * ring;
-    const count = Math.max(3, Math.round(circumference / 15));
+    const count = Math.max(3, Math.round(circumference / 19));
     const turn = rand() * Math.PI * 2;
     for (let i = 0; i < count; i += 1) {
       const a = turn + (i / count) * Math.PI * 2;
@@ -57,8 +57,8 @@
         y,
         // Leaf tips point along +y in leaf space, so turn +y toward `outward`.
         angle: outward - Math.PI / 2 + (rand() - 0.5) * 0.4,
-        length: 27 + rand() * 7,
-        width: 11.5 + rand() * 2.5,
+        length: 33 + rand() * 7,
+        width: 14 + rand() * 3,
         hue: 104 + rand() * 16,
         light: 30 + lightFromTopLeft * 26 + (1 - ring) * 6 + (rand() - 0.5) * 8
       });
@@ -84,8 +84,13 @@
 
   // ── Paint the bush once, softly shaded, into an offscreen image ──
   const art = document.createElement('canvas');
-  art.width = CW * dpr;
-  art.height = CH * dpr;
+  // Pixel-art resolution: the bush is painted ~70 pixels across, then shown
+  // scaled up with smoothing off.
+  const RES = 0.4;
+  const ART_W = Math.round(CW * RES);
+  const ART_H = Math.round(CH * RES);
+  art.width = ART_W;
+  art.height = ART_H;
   const paint = art.getContext('2d');
 
   function leafPath(length, width) {
@@ -100,12 +105,12 @@
     const top = -length / 2;
     leafPath(length, width);
     const body = paint.createLinearGradient(0, top, 0, length / 2);
-    body.addColorStop(0, `hsl(${hue + 6} 72% ${light - 10}%)`);
-    body.addColorStop(0.5, `hsl(${hue - 6} 70% ${light + 6}%)`);
-    body.addColorStop(1, `hsl(${hue - 10} 74% ${light + 1}%)`);
-    paint.shadowColor = 'rgba(10, 38, 12, 0.5)';
-    paint.shadowBlur = 5 * dpr;
-    paint.shadowOffsetY = 2 * dpr;
+    body.addColorStop(0, `hsl(${hue + 6} 75% ${light - 16}%)`);
+    body.addColorStop(0.5, `hsl(${hue - 8} 75% ${light + 12}%)`);
+    body.addColorStop(1, `hsl(${hue - 12} 78% ${light + 6}%)`);
+    paint.shadowColor = 'rgba(6, 34, 8, 0.85)';
+    paint.shadowBlur = 7 * RES;
+    paint.shadowOffsetY = 3 * RES;
     paint.fillStyle = body;
     paint.fill();
     paint.shadowColor = 'transparent';
@@ -114,11 +119,11 @@
     leafPath(length, width);
     paint.clip();
     // Far half of the cupped leaf turns away from the light.
-    paint.fillStyle = `hsla(${hue + 8}, 50%, 18%, 0.16)`;
+    paint.fillStyle = `hsla(${hue + 8}, 60%, 14%, 0.28)`;
     paint.fillRect(0, top, width * 1.2, length);
     // Soft sheen near the top of the leaf.
     const sheen = paint.createRadialGradient(-width * 0.3, top + length * 0.35, 0, -width * 0.3, top + length * 0.35, width * 1.1);
-    sheen.addColorStop(0, 'rgba(255, 255, 225, 0.32)');
+    sheen.addColorStop(0, 'rgba(240, 255, 190, 0.55)');
     sheen.addColorStop(1, 'rgba(255, 255, 225, 0)');
     paint.fillStyle = sheen;
     paint.fillRect(-width * 1.2, top, width * 2.4, length);
@@ -161,8 +166,8 @@
     petals.addColorStop(0.55, mid);
     petals.addColorStop(1, edge);
     paint.shadowColor = 'rgba(15, 50, 10, 0.5)';
-    paint.shadowBlur = 5 * dpr;
-    paint.shadowOffsetY = 2 * dpr;
+    paint.shadowBlur = 5 * RES;
+    paint.shadowOffsetY = 2 * RES;
     paint.fillStyle = petals;
     paint.fill();
     paint.shadowColor = 'transparent';
@@ -204,7 +209,7 @@
   }
 
   (function paintBush() {
-    paint.setTransform(dpr, 0, 0, dpr, PAD_X * dpr, PAD_TOP * dpr);
+    paint.setTransform(RES, 0, 0, RES, PAD_X * RES, PAD_TOP * RES);
 
     // Dark leafy depth that shows through the gaps.
     paint.beginPath();
@@ -244,6 +249,34 @@
     paint.fillStyle = ground;
     paint.fillRect(-PAD_X, H - 26, CW, 26);
     paint.globalCompositeOperation = 'source-over';
+
+    // Pixel-art finish: hard alpha edges, slightly stepped colours, and a
+    // one-pixel dark green outline around the silhouette.
+    const image = paint.getImageData(0, 0, ART_W, ART_H);
+    const px = image.data;
+    const solid = new Uint8Array(ART_W * ART_H);
+    for (let i = 0; i < solid.length; i += 1) {
+      const o = i * 4;
+      if (px[o + 3] > 110) {
+        solid[i] = 1;
+        const a = px[o + 3] / 255;
+        for (let c = 0; c < 3; c += 1) px[o + c] = Math.min(255, Math.round((px[o + c] / a) / 12) * 12);
+        px[o + 3] = 255;
+      } else {
+        px[o + 3] = 0;
+      }
+    }
+    for (let y = 0; y < ART_H; y += 1) {
+      for (let x = 0; x < ART_W; x += 1) {
+        const i = y * ART_W + x;
+        if (solid[i]) continue;
+        const touches = (x > 0 && solid[i - 1]) || (x < ART_W - 1 && solid[i + 1]) || (y > 0 && solid[i - ART_W]) || (y < ART_H - 1 && solid[i + ART_W]);
+        if (!touches) continue;
+        const o = i * 4;
+        px[o] = 18; px[o + 1] = 74; px[o + 2] = 22; px[o + 3] = 255;
+      }
+    }
+    paint.putImageData(image, 0, 0);
   })();
 
   // ── Jelly wobble ──
@@ -265,13 +298,18 @@
 
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.clearRect(0, 0, canvas.width, canvas.height);
-    for (let y = 0; y < CH; y += 1) {
+    context.imageSmoothingEnabled = false;
+    const cell = 1 / RES; // one art pixel, in CSS px
+    const widen = 1 - stretch * 0.55;
+    for (let row = 0; row < ART_H; row += 1) {
+      const y = row * cell;
       const lift = Math.max(0, Math.min(1, (base - y) / domeHeight));
-      const shift = sway * Math.pow(lift, 1.5) + Math.sin(y * 0.42 + clock * 38) * rustle * 1.1 * lift;
-      const widen = 1 - stretch * 0.55;
+      const raw = sway * Math.pow(lift, 1.5) + Math.sin(row * 1.05 + clock * 38) * rustle * 1.6 * lift;
+      // Snap sideways moves to whole art pixels so the wobble stays chunky.
+      const shift = Math.round(raw / cell) * cell;
       const destY = base - (base - y) * (1 + stretch);
       const destX = CW / 2 - (CW / 2) * widen + shift;
-      context.drawImage(art, 0, y * dpr, CW * dpr, dpr, destX * dpr, destY * dpr, CW * widen * dpr, Math.ceil((1 + stretch) * dpr) + 0.5);
+      context.drawImage(art, 0, row, ART_W, 1, Math.round(destX * dpr), Math.round(destY * dpr), Math.round(CW * widen * dpr), Math.ceil(cell * (1 + stretch) * dpr) + 1);
     }
 
     // Eyes ride along with the leaves around them.
